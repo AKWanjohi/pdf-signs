@@ -16,27 +16,23 @@ class PDFController extends Controller
         $data_uri = $request->signature;
         $encoded_image = explode(",", $data_uri)[1];
         $decoded_image = base64_decode($encoded_image);
-        Storage::put("public/images/" . $filename . ".png", $decoded_image);
+        file_put_contents($filename . ".png", $decoded_image);
 
         $data = [
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
             'phone_number' => $request->phone_number,
-            'signature' => Storage::path('public\\images\\' . $filename . '.png'),
+            'signature' => $filename . '.png'
         ];
 
         $pdf = Pdf::loadView('my_pdf', $data);
-        $pdf->save($filename . '.pdf');
+        Storage::put("public/documents/" . $filename . ".pdf", $pdf->output());
 
-        return view('my_pdf', $data);
+        unlink($filename . '.png');
 
-        Storage::move(public_path($filename . '.pdf'), 'public/documents/' . $filename . '.pdf');
+        // return Storage::download('public/documents/' . $filename . '.pdf');
 
-        Storage::delete('public/images/' . $filename . '.png');
-
-        Storage::download('/storagepublic/documents/' . $filename . '.pdf');
-
-        return redirect('/generate_pdf')->with('message', 'PDF generated successfully!');
+        return redirect('/')->with('message', 'PDF generated successfully!');
     }
 }

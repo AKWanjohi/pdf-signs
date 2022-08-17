@@ -105,8 +105,8 @@
 
     <div class="container">
         @if (session('message'))
-            <div class="alert alert-success">
-                {{ session('status') }}
+            <div class="alert alert-success mt-2">
+                {{ session('message') }}
             </div>
         @endif
 
